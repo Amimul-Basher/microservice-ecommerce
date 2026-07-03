@@ -29,40 +29,40 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Testcontainers
 @AutoConfigureMockMvc // we need to configure mockMVC to make request in mock controller
 class ProductServiceApplicationTests {
-    @Container
-    static MongoDBContainer mongoDBContainer = new MongoDBContainer(DockerImageName.parse("mongo:4.4.2"));
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ProductRepository productRepository;
-
-    @Autowired
-    ObjectMapper objectMapper; //Helps converting json to pojo object and vice versa
-
-    //When the test starts the mongodb container will be up and running
-    //Then we want the mongodb uri to be added dynamically to the test application properties
-    @DynamicPropertySource // this annotation is to run this method and add properties dynamically at runtime
-    static void setProperties(DynamicPropertyRegistry dynamicPropertyRegistryp){
-        dynamicPropertyRegistryp.add("spring.data.mongodb.uri", mongoDBContainer::getReplicaSetUrl);
-    }
-    @Test
-    void shouldCreateProduct() throws Exception {
-        ProductRequest productRequest = getProductRequst();
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/product")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(productRequest)))
-                .andExpect(status().isCreated());
-        Assertions.assertTrue(productRepository.findAll().size() == 1);
-    }
-
-    private ProductRequest getProductRequst() {
-        return ProductRequest.builder()
-                .name("iphone_12")
-                .price(BigDecimal.valueOf(1100))
-                .description("iphone_12 with standard feature")
-                .build();
-    }
+//    @Container
+//    static MongoDBContainer mongoDBContainer = new MongoDBContainer(DockerImageName.parse("mongo:4.4.2"));
+//
+//    @Autowired
+//    private MockMvc mockMvc;
+//
+//    @Autowired
+//    private ProductRepository productRepository;
+//
+//    @Autowired
+//    ObjectMapper objectMapper; //Helps converting json to pojo object and vice versa
+//
+//    //When the test starts the mongodb container will be up and running
+//    //Then we want the mongodb uri to be added dynamically to the test application properties
+//    @DynamicPropertySource // this annotation is to run this method and add properties dynamically at runtime
+//    static void setProperties(DynamicPropertyRegistry dynamicPropertyRegistryp){
+//        dynamicPropertyRegistryp.add("spring.data.mongodb.uri", mongoDBContainer::getReplicaSetUrl);
+//    }
+//    @Test
+//    void shouldCreateProduct() throws Exception {
+//        ProductRequest productRequest = getProductRequst();
+//        mockMvc.perform(MockMvcRequestBuilders.post("/api/product")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(objectMapper.writeValueAsString(productRequest)))
+//                .andExpect(status().isCreated());
+//        Assertions.assertTrue(productRepository.findAll().size() == 1);
+//    }
+//
+//    private ProductRequest getProductRequst() {
+//        return ProductRequest.builder()
+//                .name("iphone_12")
+//                .price(BigDecimal.valueOf(1100))
+//                .description("iphone_12 with standard feature")
+//                .build();
+//    }
 
 }

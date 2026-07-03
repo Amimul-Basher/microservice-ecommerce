@@ -15,5 +15,5 @@ public interface ProductService {
 
     List<ProductResponse> getProducts();
 
-    ProductResponse patchUpdate(java.lang.String id, com.bdpd.productservice.dto.ProductPatchRequest productPatchRequest);
+    ProductResponse patchUpdate(String id, ProductPatchRequest productPatchRequest);
 }

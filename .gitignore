@@ -37,3 +37,8 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+#Some data folder
+mongo-data/
+postgres-inventory/
+postgres-order/
