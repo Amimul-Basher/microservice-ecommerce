@@ -1,9 +1,6 @@
 package com.bdpd.orderservice.mapper;
 
-import com.bdpd.orderservice.dto.OrderLineItemRequest;
-import com.bdpd.orderservice.dto.OrderLineItemResponse;
-import com.bdpd.orderservice.dto.OrderRequest;
-import com.bdpd.orderservice.dto.OrderResponse;
+import com.bdpd.orderservice.dto.*;
 import com.bdpd.orderservice.model.Order;
 import com.bdpd.orderservice.model.OrderLineItem;
 
@@ -39,6 +36,13 @@ public class OrderMapper {
                 .build();
     }
 
+    public static OrderItemCheckRequest toOrderItemCheckRequest(OrderLineItemRequest orderLineItemRequest){
+        return OrderItemCheckRequest.builder()
+                .skuCode(orderLineItemRequest.skuCode())
+                .quantity(orderLineItemRequest.quantity())
+                .build();
+    }
+
     private static OrderLineItemResponse toOrderLineItemResponse(OrderLineItem orderLineItem) {
         return OrderLineItemResponse.builder()
                 .skuCode(orderLineItem.getSkuCode())
@@ -46,4 +50,5 @@ public class OrderMapper {
                 .quantity(orderLineItem.getQuantity())
                 .build();
     }
+
 }

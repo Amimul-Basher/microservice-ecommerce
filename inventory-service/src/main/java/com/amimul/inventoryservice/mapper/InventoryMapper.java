@@ -1,8 +1,6 @@
 package com.amimul.inventoryservice.mapper;
 
-import com.amimul.inventoryservice.dto.InventoryItemRequest;
-import com.amimul.inventoryservice.dto.InventoryItemResponse;
-import com.amimul.inventoryservice.dto.InventoryRequest;
+import com.amimul.inventoryservice.dto.*;
 import com.amimul.inventoryservice.model.Inventory;
 import com.amimul.inventoryservice.model.InventoryItem;
 
@@ -31,6 +29,13 @@ public class InventoryMapper {
                 .skuCode(inventoryItem.getSkuCode())
                 .quantity(inventoryItem.getQuantity())
                 .position(inventoryItem.getPosition())
+                .build();
+    }
+
+    public static OrderItemCheckResponse toOrderItemCheckResponse(OrderItemCheckRequest orderItemCheckRequest){
+        return OrderItemCheckResponse.builder()
+                .skuCode(orderItemCheckRequest.skuCode())
+                .quantity(orderItemCheckRequest.quantity())
                 .build();
     }
 }

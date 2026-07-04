@@ -1,8 +1,6 @@
 package com.amimul.inventoryservice.service;
 
-import com.amimul.inventoryservice.dto.InventoryItemRequest;
-import com.amimul.inventoryservice.dto.InventoryRequest;
-import com.amimul.inventoryservice.dto.OrderItemRequest;
+import com.amimul.inventoryservice.dto.*;
 import com.amimul.inventoryservice.model.InventoryItem;
 
 import java.util.List;
@@ -13,5 +11,5 @@ public interface InventoryService {
 
     List<InventoryItem> getInventoryItems();
 
-    List<InventoryItem> getInventoryItemsMatched(List<OrderItemRequest> orderItemRequests);
+    OrderItemsCheckResponse getInventoryItemsMatched(List<OrderItemCheckRequest> orderItemCheckRequests);
 }

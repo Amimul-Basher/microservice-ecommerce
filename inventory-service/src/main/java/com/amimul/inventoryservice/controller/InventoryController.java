@@ -1,8 +1,6 @@
 package com.amimul.inventoryservice.controller;
 
-import com.amimul.inventoryservice.dto.InventoryItemRequest;
-import com.amimul.inventoryservice.dto.InventoryRequest;
-import com.amimul.inventoryservice.dto.OrderItemRequest;
+import com.amimul.inventoryservice.dto.*;
 import com.amimul.inventoryservice.model.InventoryItem;
 import com.amimul.inventoryservice.repository.InventoryItemRepository;
 import com.amimul.inventoryservice.service.InventoryService;
@@ -42,11 +40,11 @@ public class InventoryController {
         return ResponseEntity.ok(inventoryService.getInventoryItems());
     }
 
-    @GetMapping
-    public ResponseEntity<List<InventoryItem>> getInventoryItemsMatched(
-            @RequestParam List<OrderItemRequest> orderItemRequests
+    @PostMapping("/match")
+    public ResponseEntity<OrderItemsCheckResponse> getInventoryItemsMatched(
+            @RequestBody List<OrderItemCheckRequest> orderItemCheckRequests
     ){
-        return ResponseEntity.ok(inventoryService.getInventoryItemsMatched(orderItemRequests));
+        return ResponseEntity.ok(inventoryService.getInventoryItemsMatched(orderItemCheckRequests));
     }
 
 }

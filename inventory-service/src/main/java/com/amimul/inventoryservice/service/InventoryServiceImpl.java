@@ -1,8 +1,6 @@
 package com.amimul.inventoryservice.service;
 
-import com.amimul.inventoryservice.dto.InventoryItemRequest;
-import com.amimul.inventoryservice.dto.InventoryRequest;
-import com.amimul.inventoryservice.dto.OrderItemRequest;
+import com.amimul.inventoryservice.dto.*;
 import com.amimul.inventoryservice.mapper.InventoryMapper;
 import com.amimul.inventoryservice.model.Inventory;
 import com.amimul.inventoryservice.model.InventoryItem;
@@ -47,32 +45,60 @@ public class InventoryServiceImpl implements InventoryService{
     }
 
     @Override
-    public List<InventoryItem> getInventoryItemsMatched(List<OrderItemRequest> orderItemRequests) {
-        List<InventoryItem> inventoryItemsMatched = new ArrayList<>();
+    public OrderItemsCheckResponse getInventoryItemsMatched(List<OrderItemCheckRequest> orderItemCheckRequests) {
+        List<OrderItemCheckResponse> orderItemsMatched = new ArrayList<>();
 
         //Getting list of skuCodes
-        List<String> skuCodes = orderItemRequests.stream()
-                .map(orderItemRequest -> orderItemRequest.skuCode())
+        List<String> skuCodes = orderItemCheckRequests.stream()
+                .map(orderItemCheckRequest -> orderItemCheckRequest.skuCode())
                 .toList();
         //Getting all the inventory items matched with the given sku codes and collecting them in map
         Map<String, InventoryItem> inventoryItemsMap = inventoryItemRepository.findBySkuCodeIn(skuCodes)
                 .stream()
                 .collect(Collectors.toMap(
                         InventoryItem::getSkuCode,
-                        Function.identity()
+                        Function.identity() //the object itself
                 ));
         //If inventory not matched with the request throwing runtime exception
         //otherwise returning the item list
         //This is like someone checking his list and matching with products given by product delivery man
         //Found all loading them in truck and taking home
-        for(OrderItemRequest orderItemRequest: orderItemRequests){
-            InventoryItem inventoryItem = inventoryItemsMap.get(orderItemRequest.skuCode());
-            if(inventoryItem == null || inventoryItem.getQuantity() < orderItemRequest.quantity()){
-                throw new RuntimeException("Insufficient quantity available " + orderItemRequest.skuCode() );
+
+        int allInStack = 1;
+        List<InventoryItem> inventoryItems = new ArrayList<>();
+        for(OrderItemCheckRequest orderItemCheckRequest : orderItemCheckRequests){
+            InventoryItem inventoryItem = inventoryItemsMap.get(orderItemCheckRequest.skuCode());
+            OrderItemCheckResponse orderItemCheckResponse = null;
+
+
+            if(inventoryItem == null){
+                orderItemCheckResponse = InventoryMapper.toOrderItemCheckResponse(orderItemCheckRequest);
+                orderItemCheckResponse.setStatus("Not Found");
+                allInStack = 0;
+            }else if(orderItemCheckRequest.quantity() > inventoryItem.getQuantity()){
+                orderItemCheckResponse = InventoryMapper.toOrderItemCheckResponse(orderItemCheckRequest);
+                orderItemCheckResponse.setStatus("Insufficient quantity " + (inventoryItem.getQuantity()- orderItemCheckRequest.quantity()));
+                allInStack = 0;
+            }else{
+                orderItemCheckResponse = InventoryMapper.toOrderItemCheckResponse(orderItemCheckRequest);
+                orderItemCheckResponse.setStatus("Found");
+                //update the quantity of the inventory item
+                inventoryItem.setQuantity(inventoryItem.getQuantity()- orderItemCheckRequest.quantity());
+
+                //If found then add inventory items to list to save
+                inventoryItems.add(inventoryItem);
             }
-            inventoryItemsMatched.add(inventoryItem);
+            orderItemsMatched.add(orderItemCheckResponse);
+
         }
-        return inventoryItemsMatched;
+        if(allInStack == 1){
+            inventoryItemRepository.saveAll(inventoryItems);
+        }
+
+        return OrderItemsCheckResponse.builder()
+                .allInStock(allInStack)
+                .orderItemCheckResponses(orderItemsMatched)
+                .build();
     }
 
     private InventoryItem processInventoryItemRequest(InventoryItemRequest inventoryItemRequest){
@@ -92,6 +118,7 @@ public class InventoryServiceImpl implements InventoryService{
         }else{
             inventoryItem = InventoryMapper.toInventoryItem(inventoryItemRequest);
         }
+
         return inventoryItem;
     }
 }
