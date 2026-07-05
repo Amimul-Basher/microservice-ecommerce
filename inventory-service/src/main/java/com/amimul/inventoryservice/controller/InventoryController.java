@@ -1,8 +1,8 @@
 package com.amimul.inventoryservice.controller;
 
-import com.amimul.inventoryservice.dto.InventoryItemRequest;
-import com.amimul.inventoryservice.dto.InventoryRequest;
+import com.amimul.inventoryservice.dto.*;
 import com.amimul.inventoryservice.model.InventoryItem;
+import com.amimul.inventoryservice.repository.InventoryItemRepository;
 import com.amimul.inventoryservice.service.InventoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -26,6 +26,8 @@ public class InventoryController {
 
     @Qualifier("inventoryServiceImplementation")
     private final InventoryService inventoryService;
+    private final InventoryItemRepository inventoryItemRepository;
+
     @PostMapping
     public ResponseEntity<String> doInventory(@RequestBody InventoryRequest inventoryRequest){
         inventoryService.doInventory(inventoryRequest);
@@ -36,6 +38,13 @@ public class InventoryController {
     @GetMapping("/all")
     public ResponseEntity<List<InventoryItem>> getAllInventoryItems(){
         return ResponseEntity.ok(inventoryService.getInventoryItems());
+    }
+
+    @PostMapping("/match")
+    public ResponseEntity<OrderItemsCheckResponse> getInventoryItemsMatched(
+            @RequestBody List<OrderItemCheckRequest> orderItemCheckRequests
+    ){
+        return ResponseEntity.ok(inventoryService.getInventoryItemsMatched(orderItemCheckRequests));
     }
 
 }

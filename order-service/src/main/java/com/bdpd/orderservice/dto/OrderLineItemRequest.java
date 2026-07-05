@@ -18,7 +18,7 @@ public record OrderLineItemRequest(
         @DecimalMin(value="0.0", inclusive = false)
         BigDecimal price,
         @Positive(message = "Quantity can not be negative")
-        Integer quantity,
-        Order order
+        Integer quantity
+//        Order order
 ) {
 }
