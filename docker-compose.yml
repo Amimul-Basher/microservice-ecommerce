@@ -43,3 +43,8 @@ services:
       - "27017"
     volumes:
       - ./mongo-data:/data/db
+
+  zipkin:
+    image: 'openzipkin/zipkin:latest'
+    ports:
+      - "9411:9411"

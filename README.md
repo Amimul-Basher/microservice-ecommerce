@@ -46,8 +46,11 @@ Add circuit breaker annotation to the methods to add resilience on it [Inventory
 For time limiter add TimeLimiter annotation with name and fallBack method
 To check the timeout and retry event visit using http://localhost:8081/actuator  
 
-
-
+## Distributed tracing implementation
+Add micrometer dependency to the pom file  
+Add zipkin dependency to the [pom](/api-gateway/pom.xml)  
+Install zipkin and open port using [docker file](docker-compose.yml)  
+Add properties to give access to the metrices and allow 100% to be traced in [properties](api-gateway/src/main/resources/application-ag.properties)
 
 ## Improvement
 Want to make a request from inventory to order to check if order is placed so that inventory can be updated  
