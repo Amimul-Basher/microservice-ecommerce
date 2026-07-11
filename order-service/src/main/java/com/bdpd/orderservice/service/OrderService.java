@@ -7,7 +7,7 @@ import com.bdpd.orderservice.model.Order;
 import java.util.List;
 
 public interface OrderService {
-    void placeOrder(OrderRequest orderRequest);
+    String placeOrder(OrderRequest orderRequest);
 
     List<OrderResponse> findAllOrders();
 }

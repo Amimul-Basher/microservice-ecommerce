@@ -7,8 +7,11 @@ import com.amimul.inventoryservice.model.InventoryItem;
 import com.amimul.inventoryservice.repository.InventoryItemRepository;
 import com.amimul.inventoryservice.repository.InventoryRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.function.Function;
@@ -17,6 +20,7 @@ import java.util.stream.Collectors;
 @Service("inventoryServiceImplementation")
 @Primary
 @RequiredArgsConstructor
+@Slf4j
 public class InventoryServiceImpl implements InventoryService{
 
     private final InventoryItemRepository inventoryItemRepository;
@@ -45,8 +49,17 @@ public class InventoryServiceImpl implements InventoryService{
     }
 
     @Override
+    @Transactional(readOnly = true)
+    @SneakyThrows
     public OrderItemsCheckResponse getInventoryItemsMatched(List<OrderItemCheckRequest> orderItemCheckRequests) {
         List<OrderItemCheckResponse> orderItemsMatched = new ArrayList<>();
+
+        //This code is to simulate the time limiter function of circuit breaker
+//        log.info("Wait Started");
+//        Thread.sleep(10000);
+//        log.info(Thread.currentThread().getName());
+//        log.info("Wait ended");
+
 
         //Getting list of skuCodes
         List<String> skuCodes = orderItemCheckRequests.stream()
@@ -93,6 +106,7 @@ public class InventoryServiceImpl implements InventoryService{
         }
         if(allInStack == 1){
             inventoryItemRepository.saveAll(inventoryItems);
+            log.info("inventory updated as order request processed");
         }
 
         return OrderItemsCheckResponse.builder()
