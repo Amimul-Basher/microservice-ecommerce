@@ -2,7 +2,7 @@ package com.bdpd.orderservice.dto;
 
 import lombok.Builder;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 @Builder

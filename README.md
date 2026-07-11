@@ -46,6 +46,24 @@ Add circuit breaker annotation to the methods to add resilience on it [Inventory
 For time limiter add TimeLimiter annotation with name and fallBack method
 To check the timeout and retry event visit using http://localhost:8081/actuator  
 
+## Distributed tracing implementation
+Add micrometer dependency to the pom file  
+Add zipkin dependency to the [pom](/api-gateway/pom.xml)  
+Install zipkin and open port using [docker file](docker-compose.yml)  
+Add properties to give access to the metrices and allow 100% to be traced in [properties](api-gateway/src/main/resources/application-ag.properties)
+
+## Implementation of event driven architecture
+
+**Step 1** : Develop producer and configure to send message to the broker
+Add dependencies of Apache kafka ( Broker ), ZooKeeper (Orchestrator), to the [POM](order-service/pom.xml)  
+Add the service to be running as docker container using [Docker Compose](docker-compose.yml)
+Add properties with topics and the broker url in [Applicaiton Properties](order-service/src/main/resources/application-os.properties)  
+Use KafkaTemplate to send message to the broker kafka as key value pair. [Order Service](order-service/src/main/java/com/bdpd/orderservice/service/OrderServiceImpl.java)  
+The key is the topics name and the value should be an object defined as an event object in [OrderPlacedEvent](order-service/src/main/java/com/bdpd/orderservice/event/OrderPlacedEvent.java)  
+Now to serialize and deserialize the key and object add properties to [Application properties](order-service/src/main/resources/application-os.properties)  
+Use localhost:8086 to access the kakfa broker dashboard  
+
+**Step 2** : Develop consumer to send notification to the end user
 
 
 

@@ -4,12 +4,14 @@ import com.bdpd.orderservice.clients.InventoryClient;
 import com.bdpd.orderservice.dto.OrderItemsCheckResponse;
 import com.bdpd.orderservice.dto.OrderRequest;
 import com.bdpd.orderservice.dto.OrderResponse;
+import com.bdpd.orderservice.event.OrderPlacedEvent;
 import com.bdpd.orderservice.mapper.OrderMapper;
 import com.bdpd.orderservice.model.Order;
 
 import com.bdpd.orderservice.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -29,6 +31,11 @@ public class OrderServiceImpl implements OrderService{
 
     private final InventoryClient inventoryClient;
 
+    //Always specify the key value type
+    private final KafkaTemplate<String, OrderPlacedEvent> kafkaTemplate;
+
+    //Just adding a dummy email as security is not implemented
+    private String email = "amimul@gmail.com";
 
     @Override
     public String placeOrder(OrderRequest orderRequest) {
@@ -65,6 +72,17 @@ public class OrderServiceImpl implements OrderService{
         if(orderItemsCheckResponse.getAllInStock() == 1){
             orderRepository.save(order);
             log.info("Order Placed successfully");
+
+            //Send message to kafka topic
+            //Order number and Email
+            OrderPlacedEvent orderPlacedEvent = OrderPlacedEvent.builder()
+                    .orderNumber(order.getOrderNumber())
+                    .email(this.email)
+                    .build();
+            log.info("Start sending orderplacedevent {} to kafka topic", orderPlacedEvent);
+            kafkaTemplate.send("order-placed", orderPlacedEvent);
+            log.info("End - Sending the order placed event to kafka");
+
             return "Order Successful";
         }else{
             log.warn("Check Order Items");
