@@ -4,6 +4,7 @@ import com.bdpd.orderservice.dto.OrderRequest;
 import com.bdpd.orderservice.dto.OrderResponse;
 import com.bdpd.orderservice.model.Order;
 import com.bdpd.orderservice.service.OrderService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,13 +20,17 @@ public class OrderController {
     private final OrderService orderService;
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+//    @CircuitBreaker(name = "inventory", fallbackMethod = "fallbackMethod")
     public String placeOrder(@RequestBody OrderRequest orderRequest){
-        orderService.placeOrder(orderRequest);
-        return "Order Created successfully";
+        return orderService.placeOrder(orderRequest);
     }
 
     @GetMapping("/all")
     public ResponseEntity<List<OrderResponse>> getAllOrder(){
         return ResponseEntity.ok(orderService.findAllOrders());
     }
+
+//    public String fallbackMethod(OrderRequest orderRequest, RuntimeException runtimeException){
+//        return "Opps! Something went wrong, Please order after some time!";
+//    }
 }

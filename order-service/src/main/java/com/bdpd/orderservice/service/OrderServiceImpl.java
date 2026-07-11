@@ -15,6 +15,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +31,7 @@ public class OrderServiceImpl implements OrderService{
 
 
     @Override
-    public void placeOrder(OrderRequest orderRequest) {
+    public String placeOrder(OrderRequest orderRequest) {
         Order order = OrderMapper.toOrder(orderRequest);
         order.setOrderNumber(UUID.randomUUID().toString());
         //Even though we are saving the order and have the list items added to the order, We need order to be added to the orderItem as well
@@ -47,18 +49,44 @@ public class OrderServiceImpl implements OrderService{
                         .toList();
 
         //step 2: Send the query using WebClient and receive the inventoryItemResponseList
-        OrderItemsCheckResponse orderItemsCheckResponse = inventoryClient.checkInventoryWithOrderItemRequests(orderItemCheckRequestList);
+        CompletableFuture<OrderItemsCheckResponse> future = inventoryClient.checkInventoryWithOrderItemRequests(orderItemCheckRequestList);
 
 
         //Step 3: Check Inventory item request and order check request match
 
+        OrderItemsCheckResponse orderItemsCheckResponse = null;
+        try {
+            orderItemsCheckResponse = future.get();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        }
         if(orderItemsCheckResponse.getAllInStock() == 1){
             orderRepository.save(order);
             log.info("Order Placed successfully");
+            return "Order Successful";
         }else{
             log.warn("Check Order Items");
+            return "Check Order Items";
         }
 
+//        return String.valueOf(inventoryClient.checkInventoryWithOrderItemRequests(orderItemCheckRequestList)
+//                .thenApply(response -> {
+//                            if (response.getAllInStock() == 1) {
+//                                orderRepository.save(order);
+//                                log.info("Order is placed successfully");
+//                                return "Order placed successfully";
+//                            }else{
+//                                log.info("order couldn't be placed");
+//                                return "Please review the order";
+//                            }
+//
+//                        })
+//                .exceptionally(ex -> {
+//                    ex.printStackTrace();
+//                    return null;
+//                }));
         //Step 4: if check request match save else throw an exception
 
 //        orderRepository.save(order);
