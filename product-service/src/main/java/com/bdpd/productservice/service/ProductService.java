@@ -11,9 +11,13 @@ public interface ProductService {
 
     ProductResponse updateProduct(String id, ProductRequest productRequest);
 
-    public void createProduct(ProductRequest productRequest);
+    public ProductResponse createProduct(ProductRequest productRequest);
 
     List<ProductResponse> getProducts();
 
     ProductResponse patchUpdate(String id, ProductPatchRequest productPatchRequest);
+
+    ProductResponse getProduct(String productId);
+
+    ProductResponse deleteProduct(String productId);
 }
