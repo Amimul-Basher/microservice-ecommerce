@@ -43,3 +43,6 @@ mongo-data/
 postgres-inventory/
 postgres-order/
 logs/spring.log
+
+## Password ##
+.env

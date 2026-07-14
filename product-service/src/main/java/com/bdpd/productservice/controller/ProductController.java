@@ -21,31 +21,41 @@ public class ProductController {
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    public void createProduct(@RequestBody ProductRequest productRequest){
-        productService.createProduct(productRequest);
+    public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductRequest productRequest){
+         return ResponseEntity.ok(productService.createProduct(productRequest));
     }
 
-    @GetMapping("/all")
+    @GetMapping("/products")
     @ResponseStatus(HttpStatus.OK)
     public List<ProductResponse> getProducts(){
         return productService.getProducts();
     }
 
-    @PutMapping("/{id}")
+    @GetMapping("/get/{id}")
+    public ProductResponse getProduct(@PathVariable("id") String productId){
+        return productService.getProduct(productId);
+    }
+
+    @PutMapping("/put/{id}")
     public ResponseEntity<ProductResponse> updateProduct(
-            @PathVariable("id") String id,
+            @PathVariable String id,
             @RequestBody ProductRequest productRequest
     ){
         return ResponseEntity.ok(productService.updateProduct(id, productRequest));
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping("/patch/{id}")
     public ResponseEntity<ProductResponse> updateProductPatch(
             @PathVariable("id") String id,
             @RequestBody ProductPatchRequest productPatchRequest
     ){
             return ResponseEntity.ok(productService.patchUpdate(id, productPatchRequest));
 
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<ProductResponse> deleteProduct(@PathVariable("id") String productId){
+        return ResponseEntity.ok(productService.deleteProduct(productId));
     }
 
 
